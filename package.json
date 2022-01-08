@@ -1,0 +1,34 @@
+{
+  "name": "putio-downloader",
+  "version": "1.0.0",
+  "description": "Put.io downloader app",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap \"test/**/*.test.js\"",
+    "start": "fastify start -l info -P ./src/app.js --address 0.0.0.0",
+    "dev": "fastify start -w -l info -P ./src/app.js --ignore-watch='node_modules .git tmp'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "fastify": "^3.0.0",
+    "fastify-autoload": "^3.3.1",
+    "fastify-cli": "^2.14.0",
+    "fastify-env": "^2.1.1",
+    "fastify-formbody": "^5.2.0",
+    "fastify-plugin": "^3.0.0",
+    "fastify-sensible": "^3.1.0",
+    "fastq": "^1.13.0",
+    "fluent-json-schema": "^3.0.1",
+    "node-schedule": "^2.1.0",
+    "unzip-stream": "^0.3.1"
+  },
+  "devDependencies": {
+    "tap": "^15.0.9"
+  }
+}
