@@ -4,15 +4,17 @@ This project creates a an API that can receive callbacks from [Put.io](https://p
 
 This project was bootstrapped with the [Fastify-CLI](https://github.com/fastify/fastify).
 
-<br />
-
 ## Getting Started
 
 ```
 npm install
 ```
 
-<br />
+Create a .env file in the root of the project like the following:
+
+```
+ACCESS_TOKEN=XXXXXXXX
+```
 
 ## Development
 
@@ -22,10 +24,16 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-<br />
-
 ## Test
 
 ```
 npm test
+```
+
+## Deployment
+
+Use docker compose to launch the downloader API and Filebot together:
+
+```sh
+docker-compose -f docker-compose.yaml --env-file .env up -d
 ```

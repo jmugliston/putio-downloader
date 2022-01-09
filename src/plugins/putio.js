@@ -8,11 +8,11 @@ async function putio(fastify, opts) {
   axios.interceptors.response.use((res) => res.data);
 
   async function getFiles() {
-    return axios.get(`${apiRoot}/files/list`);
+    return axios.get("/files/list");
   }
 
   async function createZip(fileId) {
-    return axios.post(`/zips/create`, qs.stringify({ file_ids: fileId }), {
+    return axios.post("/zips/create", qs.stringify({ file_ids: fileId }), {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -32,7 +32,7 @@ async function putio(fastify, opts) {
   }
 
   async function deleteFile(fileId) {
-    return axios.post(`/files/delete`, qs.stringify({ file_ids: fileId }), {
+    return axios.post("/files/delete", qs.stringify({ file_ids: fileId }), {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },

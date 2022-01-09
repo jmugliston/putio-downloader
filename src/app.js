@@ -3,16 +3,16 @@ const AutoLoad = require("fastify-autoload");
 const Env = require("fastify-env");
 const S = require("fluent-json-schema");
 const schedule = require("node-schedule");
-const putio = require("./services/putio");
-const processor = require("./services/processor");
-const queue = require("./services/queue");
+const putio = require("./plugins/putio");
+const processor = require("./plugins/processor");
+const queue = require("./plugins/queue");
 
 module.exports = async function (fastify, opts) {
   // Get environment config
   await fastify.register(Env, {
     schema: S.object()
       .prop("NODE_ENV", S.string().required().default("production"))
-      .prop("ACCESS_TOKEN", S.string().required())
+      .prop("ACCESS_TOKEN", S.string().required().default(""))
       .prop("DOWNLOAD_DIR", S.string().required().default("./tmp"))
       .prop("FILEBOT_ENABLED", S.boolean().required().default(true))
       .prop(
@@ -22,7 +22,14 @@ module.exports = async function (fastify, opts) {
       .valueOf(),
   });
 
-  // Custom plugins (need to be loaded in order)
+  // Register plugins
+  fastify.register(require("fastify-sensible"), {
+    errorHandler: false,
+  });
+  fastify.register(require("fastify-healthcheck"));
+  fastify.register(require("fastify-formbody"));
+
+  // Register custom plugins (need to be loaded in order)
   await fastify.register(putio, { accessToken: fastify.config.ACCESS_TOKEN });
   await fastify.register(processor, {
     downloadDir: fastify.config.DOWNLOAD_DIR,
@@ -30,22 +37,13 @@ module.exports = async function (fastify, opts) {
   });
   await fastify.register(queue);
 
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, "plugins"),
-    options: Object.assign({}, opts),
-  });
-
-  // This loads all plugins defined in routes
-  // define your routes in one of these
+  // Define routes
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, "routes"),
     options: Object.assign({}, opts),
   });
 
-  // Schedule job to run every day (in case callbacks are missed)
+  // Schedule a job to run every day (in case Put.io callbacks are missed)
   schedule.scheduleJob("0 6 * * *", async () => {
     fastify.log.info("Starting download files job");
     const { files } = await fastify.putio.getFiles();

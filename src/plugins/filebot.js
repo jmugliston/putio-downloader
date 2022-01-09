@@ -1,8 +1,10 @@
 const fp = require("fastify-plugin");
 const axios = require("axios");
 
-module.exports = fp(async function (fastify, opts) {
-  fastify.decorate("filebot", () =>
-    axios.get(`${fastify.config.FILEBOT_NODE_URL}/task?id=0`)
-  );
-});
+async function filebot(fastify, opts) {
+  fastify.decorate("filebot", async function runFilebot() {
+    axios.get(`${fastify.config.FILEBOT_NODE_URL}/task?id=0`);
+  });
+}
+
+module.exports = fp(filebot);
