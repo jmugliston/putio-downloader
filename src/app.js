@@ -9,12 +9,12 @@ const queue = require("./services/queue");
 
 module.exports = async function (fastify, opts) {
   // Get environment config
-  fastify.register(Env, {
+  await fastify.register(Env, {
     schema: S.object()
       .prop("NODE_ENV", S.string().required().default("production"))
       .prop("ACCESS_TOKEN", S.string().required())
       .prop("DOWNLOAD_DIR", S.string().required().default("./tmp"))
-      .prop("FILEBOT_ENABLED", S.string().required().default("true"))
+      .prop("FILEBOT_ENABLED", S.boolean().required().default(true))
       .prop(
         "FILEBOT_NODE_URL",
         S.string().required().default("http://filebot-node:5452")
@@ -23,8 +23,11 @@ module.exports = async function (fastify, opts) {
   });
 
   // Custom plugins (need to be loaded in order)
-  await fastify.register(putio);
-  await fastify.register(processor);
+  await fastify.register(putio, { accessToken: fastify.config.ACCESS_TOKEN });
+  await fastify.register(processor, {
+    downloadDir: fastify.config.DOWNLOAD_DIR,
+    filebotEnabled: fastify.config.FILEBOT_ENABLED,
+  });
   await fastify.register(queue);
 
   // This loads all plugins defined in plugins

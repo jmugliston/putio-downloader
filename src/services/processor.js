@@ -5,20 +5,15 @@ const { promisify } = require("util");
 const pipeline = promisify(stream.pipeline);
 const sleep = promisify(setTimeout);
 
-module.exports = fp(async (fastify, opts) => {
-  const logger = fastify.log;
-  const downloadDir = fastify.config.DOWNLOAD_DIR;
-  const { createZip, checkZipStatus, getDownloadStream, deleteFile } =
-    fastify.putio;
+async function processorPlugin(fastify, opts) {
+  const { downloadDir, filebotEnabled } = opts;
 
-  /**
-   * Process a file from put.io
-   * @param {*} fileId - The file id to process
-   * @param {*} logger - The logger to use
-   */
-  const processFile = async (fileId) => {
+  fastify.decorate("processor", async function processFile(fileId) {
     try {
-      logger.info({ fileId }, "creating put.io zip file");
+      const { createZip, checkZipStatus, getDownloadStream, deleteFile } =
+        fastify.putio;
+
+      fastify.log.info({ fileId }, "creating put.io zip file");
 
       const { zip_id: zipId } = await createZip(fileId);
 
@@ -26,11 +21,11 @@ module.exports = fp(async (fastify, opts) => {
       let retryCount = 0;
 
       while (!url && retryCount <= 3) {
-        logger.info({ zipId }, "checking zip status");
+        fastify.log.info({ zipId }, "checking zip status");
         const res = await checkZipStatus(zipId);
         url = res.url;
         if (!url) {
-          logger.warn({ zipId }, "zip file not ready");
+          fastify.log.warn({ zipId }, "zip file not ready");
           retryCount += 1;
           await sleep(3000);
         }
@@ -40,7 +35,7 @@ module.exports = fp(async (fastify, opts) => {
         throw new Error({ zipId }, "failed to get zip file");
       }
 
-      logger.info({ fileId, zipId }, "starting download");
+      fastify.log.info({ fileId, zipId }, "starting download");
 
       const downloadStream = await getDownloadStream(url);
 
@@ -49,23 +44,24 @@ module.exports = fp(async (fastify, opts) => {
         unzip.Extract({ path: `${downloadDir}/` })
       );
 
-      logger.info({ fileId, zipId }, "finished download");
+      fastify.log.info({ fileId, zipId }, "finished download");
 
-      logger.info({ fileId }, "deleting file from put.io");
+      fastify.log.info({ fileId }, "deleting file from put.io");
 
       await deleteFile(fileId);
 
-      if (fastify.config.FILEBOT_ENABLED === "true") {
-        logger.info("running filebot task");
+      if (filebotEnabled) {
+        fastify.log.info("running filebot task");
         await fastify.filebot();
       }
 
-      logger.info("finished processing");
+      fastify.log.info("finished processing");
     } catch (error) {
-      logger.error(error);
+      fastify.log.error(error);
     }
-    return true;
-  };
 
-  fastify.decorate("processor", (fileId) => processFile(fileId));
-});
+    return true;
+  });
+}
+
+module.exports = fp(processorPlugin);

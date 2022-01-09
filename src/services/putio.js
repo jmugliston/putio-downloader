@@ -2,49 +2,42 @@ const fp = require("fastify-plugin");
 const axios = require("axios");
 const qs = require("querystring");
 
-module.exports = fp(async function (fastify, opts) {
-  const apiRoot = "https://api.put.io/v2";
-
-  const accessToken = fastify.config.ACCESS_TOKEN;
-
-  const headers = {
-    Authorization: `Bearer ${accessToken}`,
-  };
-
+async function putio(fastify, opts) {
+  axios.defaults.baseURL = "https://api.put.io/v2";
+  axios.defaults.headers.common["Authorization"] = `Bearer ${opts.accessToken}`;
   axios.interceptors.response.use((res) => res.data);
 
-  const getFiles = async () =>
-    axios.get(`${apiRoot}/files/list`, {
-      headers,
-    });
+  async function getFiles() {
+    return axios.get(`${apiRoot}/files/list`);
+  }
 
-  const createZip = async (fileId) =>
-    axios.post(`${apiRoot}/zips/create`, qs.stringify({ file_ids: fileId }), {
+  async function createZip(fileId) {
+    return axios.post(`/zips/create`, qs.stringify({ file_ids: fileId }), {
       headers: {
-        ...headers,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
+  }
 
-  const checkZipStatus = async (zipId) =>
-    axios.get(`${apiRoot}/zips/${zipId}`, {
-      headers,
-    });
+  async function checkZipStatus(zipId) {
+    return axios.get(`/zips/${zipId}`);
+  }
 
-  const getDownloadStream = async (url) =>
-    axios({
+  async function getDownloadStream(url) {
+    return axios({
       url,
       method: "GET",
       responseType: "stream",
     });
+  }
 
-  const deleteFile = (fileId) =>
-    axios.post(`${apiRoot}/files/delete`, qs.stringify({ file_ids: fileId }), {
+  async function deleteFile(fileId) {
+    return axios.post(`/files/delete`, qs.stringify({ file_ids: fileId }), {
       headers: {
-        ...headers,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
+  }
 
   fastify.decorate("putio", {
     getFiles,
@@ -53,4 +46,6 @@ module.exports = fp(async function (fastify, opts) {
     getDownloadStream,
     deleteFile,
   });
-});
+}
+
+module.exports = fp(putio);
