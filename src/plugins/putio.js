@@ -33,8 +33,7 @@ async function putio(fastify, opts) {
   }
 
   async function getDownloadStream(url) {
-    return axiosInstance.get({
-      url,
+    return axiosInstance.get(url, {
       responseType: "stream",
     });
   }
