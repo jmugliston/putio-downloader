@@ -57,7 +57,11 @@ async function processorPlugin(fastify, opts) {
 
       fastify.log.info("finished processing");
     } catch (error) {
-      fastify.log.error(error);
+      if (error.isAxiosError) {
+        fastify.log.error(error.toJSON());
+      } else {
+        fastify.log.error(error);
+      }
     }
 
     return true;

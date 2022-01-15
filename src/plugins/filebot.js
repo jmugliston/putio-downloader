@@ -3,7 +3,11 @@ const axios = require("axios");
 
 async function filebot(fastify, opts) {
   fastify.decorate("filebot", async function runFilebot() {
-    axios.get(`${fastify.config.FILEBOT_NODE_URL}/task?id=0`);
+    try {
+      axios.get(`${fastify.config.FILEBOT_NODE_URL}/task?id=0`);
+    } catch (err) {
+      fastify.log.error("Failed to run filebot task");
+    }
   });
 }
 
