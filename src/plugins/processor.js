@@ -51,7 +51,6 @@ async function processorPlugin(fastify, opts) {
       await deleteFile(fileId);
 
       if (filebotEnabled) {
-        fastify.log.info("running filebot task");
         await fastify.filebot();
       }
 
