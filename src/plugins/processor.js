@@ -10,10 +10,21 @@ async function processorPlugin(fastify, opts) {
 
   fastify.decorate("processor", async function processFile(fileId) {
     try {
-      const { createZip, checkZipStatus, getDownloadStream, deleteFile } =
-        fastify.putio;
+      const {
+        getFileInfo,
+        createZip,
+        checkZipStatus,
+        getDownloadStream,
+        deleteFile,
+      } = fastify.putio;
 
-      fastify.log.info({ fileId }, "creating put.io zip file");
+      fastify.log.info({ fileId }, `Checking file info [${fileId}]`);
+
+      const {
+        file: { name: fileName },
+      } = await getFileInfo(fileId);
+
+      fastify.log.info({ fileId }, `creating put.io zip file [${fileName}]`);
 
       const { zip_id: zipId } = await createZip(fileId);
 
@@ -25,17 +36,17 @@ async function processorPlugin(fastify, opts) {
         const res = await checkZipStatus(zipId);
         url = res.url;
         if (!url) {
-          fastify.log.warn({ zipId }, "zip file not ready");
+          fastify.log.warn({ zipId }, `zip file not ready [${fileName}]`);
           retryCount += 1;
           await sleep(3000);
         }
       }
 
       if (!url) {
-        throw new Error({ zipId }, "failed to get zip file");
+        throw new Error({ zipId }, `failed to get zip file [${fileName}]`);
       }
 
-      fastify.log.info({ fileId, zipId }, "starting download");
+      fastify.log.info({ fileId, zipId }, `starting download [${fileName}]`);
 
       const downloadStream = await getDownloadStream(url);
 
@@ -44,9 +55,9 @@ async function processorPlugin(fastify, opts) {
         unzip.Extract({ path: `${downloadDir}/` })
       );
 
-      fastify.log.info({ fileId, zipId }, "finished download");
+      fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`);
 
-      fastify.log.info({ fileId }, "deleting file from put.io");
+      fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`);
 
       await deleteFile(fileId);
 
@@ -54,7 +65,7 @@ async function processorPlugin(fastify, opts) {
         await fastify.filebot();
       }
 
-      fastify.log.info("finished processing");
+      fastify.log.info(`finished processing [${fileName}]`);
     } catch (error) {
       if (error.isAxiosError) {
         fastify.log.error(error.toJSON());

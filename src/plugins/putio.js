@@ -16,6 +16,10 @@ async function putio(fastify, opts) {
     return axiosInstance.get("/files/list");
   }
 
+  async function getFileInfo(fileId) {
+    return axiosInstance.get(`files/${fileId}`);
+  }
+
   async function createZip(fileId) {
     return axiosInstance.post(
       "/zips/create",
@@ -52,6 +56,7 @@ async function putio(fastify, opts) {
 
   fastify.decorate("putio", {
     getFiles,
+    getFileInfo,
     createZip,
     checkZipStatus,
     getDownloadStream,
