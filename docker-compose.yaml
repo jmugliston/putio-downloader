@@ -6,9 +6,8 @@ services:
     container_name: putio-downloader
     volumes:
       - ${DOWNLOAD_DIR:-./volumes/download}:/download
-    environment:
-      - DOWNLOAD_DIR=/download
-      - ACCESS_TOKEN=${ACCESS_TOKEN}
+    env_file:
+      - .env
     ports:
       - 127.0.0.1:3000:3000
     networks:
