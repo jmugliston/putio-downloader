@@ -6,7 +6,7 @@ const pipeline = promisify(stream.pipeline);
 const sleep = promisify(setTimeout);
 
 async function processorPlugin(fastify, opts) {
-  const { downloadDir, filebotEnabled } = opts;
+  const { downloadDir } = opts;
 
   fastify.decorate("processor", async function processFile(fileId) {
     try {
@@ -52,7 +52,7 @@ async function processorPlugin(fastify, opts) {
 
       await pipeline(
         downloadStream,
-        unzip.Extract({ path: `${downloadDir}/` })
+        unzip.Extract({ path: downloadDir })
       );
 
       fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`);
@@ -60,10 +60,6 @@ async function processorPlugin(fastify, opts) {
       fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`);
 
       await deleteFile(fileId);
-
-      if (filebotEnabled) {
-        await fastify.filebot();
-      }
 
       fastify.log.info(`finished processing [${fileName}]`);
     } catch (error) {

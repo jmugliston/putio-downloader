@@ -3,7 +3,6 @@ const AutoLoad = require("fastify-autoload");
 const Env = require("fastify-env");
 const S = require("fluent-json-schema");
 const schedule = require("node-schedule");
-const filebot = require("./plugins/filebot");
 const putio = require("./plugins/putio");
 const processor = require("./plugins/processor");
 const queue = require("./plugins/queue");
@@ -15,11 +14,6 @@ module.exports = async function (fastify, opts) {
       .prop("NODE_ENV", S.string().required().default("production"))
       .prop("ACCESS_TOKEN", S.string().required().default(""))
       .prop("DOWNLOAD_DIR", S.string().required().default("./tmp"))
-      .prop("FILEBOT_ENABLED", S.boolean().required().default(true))
-      .prop(
-        "FILEBOT_NODE_URL",
-        S.string().required().default("http://filebot-node:5452")
-      )
       .valueOf(),
   });
 
@@ -31,11 +25,9 @@ module.exports = async function (fastify, opts) {
   fastify.register(require("fastify-formbody"));
 
   // Register custom plugins (need to be loaded in order)
-  await fastify.register(filebot);
   await fastify.register(putio, { accessToken: fastify.config.ACCESS_TOKEN });
   await fastify.register(processor, {
     downloadDir: fastify.config.DOWNLOAD_DIR,
-    filebotEnabled: fastify.config.FILEBOT_ENABLED,
   });
   await fastify.register(queue);
 

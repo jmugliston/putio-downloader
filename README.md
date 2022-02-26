@@ -29,11 +29,3 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 ```
 npm test
 ```
-
-## Deployment
-
-Use docker compose to launch the downloader API and Filebot together:
-
-```sh
-docker-compose -f docker-compose.yaml --env-file .env up -d
-```
