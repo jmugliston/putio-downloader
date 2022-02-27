@@ -14,4 +14,7 @@ COPY --chown=node:node src ./src
 
 USER node
 
+HEALTHCHECK --interval=60s --timeout=10s --start-period=5s \
+    CMD node ./src/healthcheck.js
+
 CMD ["dumb-init", "npm", "start"]
