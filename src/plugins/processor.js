@@ -50,10 +50,7 @@ async function processorPlugin(fastify, opts) {
 
       const downloadStream = await getDownloadStream(url);
 
-      await pipeline(
-        downloadStream,
-        unzip.Extract({ path: downloadDir })
-      );
+      await pipeline(downloadStream, unzip.Extract({ path: downloadDir }));
 
       fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`);
 

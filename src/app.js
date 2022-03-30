@@ -9,7 +9,7 @@ const processor = require("./plugins/processor");
 const queue = require("./plugins/queue");
 
 module.exports = async function (fastify, opts) {
-  fastify.log.info(`App version: ${pjson.version}`)
+  fastify.log.info(`App version: ${pjson.version}`);
 
   // Get environment config
   await fastify.register(Env, {
@@ -33,6 +33,13 @@ module.exports = async function (fastify, opts) {
     downloadDir: fastify.config.DOWNLOAD_DIR,
   });
   await fastify.register(queue);
+
+  // Disable logging of healthcheck route
+  fastify.addHook("onRoute", (opts) => {
+    if (opts.path === "/healthcheck") {
+      opts.logLevel = "silent";
+    }
+  });
 
   // Define routes
   fastify.register(AutoLoad, {
