@@ -33,6 +33,8 @@ async function processorPlugin(fastify, opts) {
       let url = null;
       let retryCount = 0;
 
+      await sleep(1500);
+
       while (!url && retryCount <= 3) {
         fastify.log.info({ zipId }, "checking zip status");
         const res = await checkZipStatus(zipId);
@@ -52,7 +54,7 @@ async function processorPlugin(fastify, opts) {
 
       const downloadStream = await getDownloadStream(url);
 
-      const processedFiles = new Set();
+      const processedDirs = new Set();
 
       await pipeline(
         downloadStream,
@@ -60,16 +62,16 @@ async function processorPlugin(fastify, opts) {
         stream.Transform({
           objectMode: true,
           transform: function (entry, e, cb) {
-            const filePath = entry.path;
+            // Download as "hidden" folder with . prefix
+            const filePath = `.${entry.path}`;
             const type = entry.type;
             if (type === "File") {
-              // Download as "hidden" file
-              const outputFilepath = `${downloadDir}/.${filePath}`;
+              const outputFilepath = path.join(downloadDir, filePath);
               const outputDir = path.dirname(outputFilepath);
               if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true });
               }
-              processedFiles.add(outputDir);
+              processedDirs.add(path.dirname(filePath).split(path.sep)[0]);
               entry.pipe(fs.createWriteStream(outputFilepath)).on("finish", cb);
             } else {
               entry.autodrain();
@@ -79,11 +81,11 @@ async function processorPlugin(fastify, opts) {
         })
       );
 
-      // Now un-hide the files
-      for (file of processedFiles) {
+      // Now un-hide the folders
+      for (dir of processedDirs) {
         fs.renameSync(
-          file,
-          file.replace(`${downloadDir}/.`, `${downloadDir}/`)
+          path.join(downloadDir, dir),
+          path.join(downloadDir, dir.replace(".", ""))
         );
       }
 
