@@ -15,22 +15,23 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.24.0",
-    "fastify": "^3.0.0",
-    "fastify-autoload": "^3.3.1",
-    "fastify-cli": "^2.14.0",
-    "fastify-env": "^2.1.1",
-    "fastify-formbody": "^5.2.0",
-    "fastify-healthcheck": "^3.1.0",
-    "fastify-plugin": "^3.0.0",
-    "fastify-sensible": "^3.1.0",
+    "@fastify/autoload": "^5.4.0",
+    "@fastify/basic-auth": "^4.0.0",
+    "@fastify/env": "^4.1.0",
+    "@fastify/formbody": "^7.2.0",
+    "@fastify/sensible": "^5.1.1",
+    "axios": "^0.27.2",
+    "fastify": "^4.5.3",
+    "fastify-cli": "^5.4.1",
+    "fastify-healthcheck": "^4.2.0",
+    "fastify-plugin": "^4.2.1",
     "fastq": "^1.13.0",
-    "fluent-json-schema": "^3.0.1",
+    "fluent-json-schema": "^3.1.0",
     "node-schedule": "^2.1.0",
     "retry": "^0.13.1",
     "unzip-stream": "^0.3.1"
   },
   "devDependencies": {
-    "tap": "^15.0.9"
+    "tap": "^16.3.0"
   }
 }
