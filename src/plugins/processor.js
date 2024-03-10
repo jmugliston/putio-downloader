@@ -76,16 +76,14 @@ async function processorPlugin(fastify, opts) {
         stream.Transform({
           objectMode: true,
           transform: function (entry, e, cb) {
-            // Download as "hidden" folder with . prefix
-            const filePath = `.${entry.path}`;
             const type = entry.type;
             if (type === "File") {
-              const outputFilepath = path.join(downloadDir, filePath);
+              const outputFilepath = path.join(downloadDir, entry.path);
               const outputDir = path.dirname(outputFilepath);
               if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true });
               }
-              processedDirs.add(path.dirname(filePath).split(path.sep)[0]);
+              processedDirs.add(path.dirname(entry.path).split(path.sep)[0]);
               entry.pipe(fs.createWriteStream(outputFilepath)).on("finish", cb);
             } else {
               entry.autodrain();
@@ -94,14 +92,6 @@ async function processorPlugin(fastify, opts) {
           },
         })
       );
-
-      // Now un-hide the folders
-      for (dir of processedDirs) {
-        fs.renameSync(
-          path.join(downloadDir, dir),
-          path.join(downloadDir, dir.replace(".", ""))
-        );
-      }
 
       fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`);
 
