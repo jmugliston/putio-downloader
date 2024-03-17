@@ -76,14 +76,16 @@ async function processorPlugin(fastify, opts) {
         stream.Transform({
           objectMode: true,
           transform: function (entry, e, cb) {
+            // Download as "hidden" folder with . prefix
+            const filePath = `.${entry.path}`;
             const type = entry.type;
             if (type === "File") {
-              const outputFilepath = path.join(downloadDir, entry.path);
+              const outputFilepath = path.join(downloadDir, filePath);
               const outputDir = path.dirname(outputFilepath);
               if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true });
               }
-              processedDirs.add(path.dirname(entry.path).split(path.sep)[0]);
+              processedDirs.add(path.dirname(filePath).split(path.sep)[0]);
               entry.pipe(fs.createWriteStream(outputFilepath)).on("finish", cb);
             } else {
               entry.autodrain();
@@ -93,6 +95,14 @@ async function processorPlugin(fastify, opts) {
         })
       );
 
+      // Now un-hide the folders
+      for (dir of processedDirs) {
+        fs.renameSync(
+          path.join(downloadDir, dir),
+          path.join(downloadDir, dir.replace(".", ""))
+        );
+      }
+
       fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`);
 
       fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`);
@@ -100,11 +110,6 @@ async function processorPlugin(fastify, opts) {
       await deleteFile(fileId);
 
       fastify.log.info(`finished processing [${fileName}]`);
-
-      fs.appendFileSync(
-        path.join(downloadDir, "putio-downloader.log"),
-        `${new Date().toISOString()} ${fileName}\n`
-      );
     } catch (error) {
       if (error.isAxiosError) {
         fastify.log.error(error.toJSON());
