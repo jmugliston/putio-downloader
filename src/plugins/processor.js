@@ -100,6 +100,11 @@ async function processorPlugin(fastify, opts) {
       await deleteFile(fileId);
 
       fastify.log.info(`finished processing [${fileName}]`);
+
+      fs.appendFileSync(
+        path.join(downloadDir, "putio-downloader.log"),
+        `${new Date().toISOString()} ${fileName}\n`
+      );
     } catch (error) {
       if (error.isAxiosError) {
         fastify.log.error(error.toJSON());
