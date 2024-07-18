@@ -14,11 +14,17 @@ module.exports = async function (fastify, opts) {
   // Get environment config
   await fastify.register(Env, {
     schema: S.object()
-      .prop("NODE_ENV", S.string().required().default("production"))
+      .prop("NODE_ENV", S.string().required().default("dev"))
       .prop("ACCESS_TOKEN", S.string().required().default(""))
-      .prop("DOWNLOAD_DIR", S.string().required().default("./tmp"))
+      .prop("PROCESSING_DIR", S.string().required().default("./download"))
+      .prop("DOWNLOAD_DIR", S.string().required().default("./download"))
+      .prop("DOWNLOAD_SCHEDULE_ENABLED", S.boolean().default(false))
+      .prop("DOWNLOAD_SCHEDULE_CRON", S.string().default("0 6 * * *"))
       .valueOf(),
   });
+
+  fastify.log.info(`📁 Processing dir: ${fastify.config.PROCESSING_DIR}`);
+  fastify.log.info(`📁 Download dir: ${fastify.config.DOWNLOAD_DIR}`);
 
   // Register plugins
   fastify.register(require("@fastify/sensible"), {
@@ -30,6 +36,7 @@ module.exports = async function (fastify, opts) {
   // Register custom plugins (need to be loaded in order)
   await fastify.register(putio, { accessToken: fastify.config.ACCESS_TOKEN });
   await fastify.register(processor, {
+    processingDir: fastify.config.PROCESSING_DIR,
     downloadDir: fastify.config.DOWNLOAD_DIR,
   });
   await fastify.register(queue);
@@ -47,12 +54,16 @@ module.exports = async function (fastify, opts) {
     options: Object.assign({}, opts),
   });
 
-  // Schedule a job to run every day (in case Put.io callbacks are missed)
-  schedule.scheduleJob("0 6 * * *", async () => {
-    fastify.log.info("Starting download files job");
-    const { files } = await fastify.putio.getFiles();
-    for (const file of files) {
-      fastify.queue(file.id);
-    }
-  });
+  if (fastify.config.DOWNLOAD_SCHEDULE_ENABLED) {
+    fastify.log.info(
+      `🕒 Download schedule enabled: ${fastify.config.DOWNLOAD_SCHEDULE_CRON}`
+    );
+    schedule.scheduleJob(fastify.config.DOWNLOAD_SCHEDULE_CRON, async () => {
+      fastify.log.info("Starting download files job");
+      const { files } = await fastify.putio.getFiles();
+      for (const file of files) {
+        fastify.queue(file.id);
+      }
+    });
+  }
 };

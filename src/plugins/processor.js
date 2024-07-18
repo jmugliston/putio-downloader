@@ -10,7 +10,7 @@ const pipeline = promisify(stream.pipeline);
 const sleep = promisify(setTimeout);
 
 async function processorPlugin(fastify, opts) {
-  const { downloadDir } = opts;
+  const { downloadDir, processingDir } = opts;
 
   fastify.decorate("processor", async function processFile(fileId) {
     try {
@@ -68,7 +68,7 @@ async function processorPlugin(fastify, opts) {
 
       const downloadStream = await getDownloadStream(url);
 
-      const processedDirs = new Set();
+      const processedItems = new Set();
 
       await pipeline(
         downloadStream,
@@ -76,16 +76,14 @@ async function processorPlugin(fastify, opts) {
         stream.Transform({
           objectMode: true,
           transform: function (entry, e, cb) {
-            // Download as "hidden" folder with . prefix
-            const filePath = `.${entry.path}`;
             const type = entry.type;
             if (type === "File") {
-              const outputFilepath = path.join(downloadDir, filePath);
+              const outputFilepath = path.join(processingDir, entry.path);
               const outputDir = path.dirname(outputFilepath);
               if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true });
               }
-              processedDirs.add(path.dirname(filePath).split(path.sep)[0]);
+              processedItems.add(path.dirname(entry.path).split(path.sep)[0]);
               entry.pipe(fs.createWriteStream(outputFilepath)).on("finish", cb);
             } else {
               entry.autodrain();
@@ -95,11 +93,10 @@ async function processorPlugin(fastify, opts) {
         })
       );
 
-      // Now un-hide the folders
-      for (dir of processedDirs) {
+      for (item of processedItems) {
         fs.renameSync(
-          path.join(downloadDir, dir),
-          path.join(downloadDir, dir.replace(".", ""))
+          path.join(processingDir, item),
+          path.join(downloadDir, item)
         );
       }
 
@@ -107,7 +104,7 @@ async function processorPlugin(fastify, opts) {
 
       fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`);
 
-      await deleteFile(fileId);
+      // await deleteFile(fileId);
 
       fastify.log.info(`finished processing [${fileName}]`);
     } catch (error) {

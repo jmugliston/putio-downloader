@@ -12,26 +12,26 @@
     "dev": "fastify start -w -l info -P ./src/app.js --ignore-watch='node_modules .git tmp'"
   },
   "keywords": [],
-  "author": "",
+  "author": "James Mugliston",
   "license": "ISC",
   "dependencies": {
-    "@fastify/autoload": "^5.4.0",
-    "@fastify/basic-auth": "^4.0.0",
-    "@fastify/env": "^4.1.0",
-    "@fastify/formbody": "^7.2.0",
-    "@fastify/sensible": "^5.1.1",
-    "axios": "^0.27.2",
-    "fastify": "^4.5.3",
-    "fastify-cli": "^5.4.1",
-    "fastify-healthcheck": "^4.2.0",
-    "fastify-plugin": "^4.2.1",
-    "fastq": "^1.13.0",
-    "fluent-json-schema": "^3.1.0",
-    "node-schedule": "^2.1.0",
+    "@fastify/autoload": "^5.10.0",
+    "@fastify/basic-auth": "^5.1.1",
+    "@fastify/env": "^4.4.0",
+    "@fastify/formbody": "^7.4.0",
+    "@fastify/sensible": "^5.6.0",
+    "axios": "^1.7.2",
+    "fastify": "^4.28.1",
+    "fastify-cli": "^6.2.1",
+    "fastify-healthcheck": "^4.4.0",
+    "fastify-plugin": "^4.5.1",
+    "fastq": "^1.17.1",
+    "fluent-json-schema": "^5.0.0",
+    "node-schedule": "^2.1.1",
     "retry": "^0.13.1",
-    "unzip-stream": "^0.3.1"
+    "unzip-stream": "^0.3.4"
   },
   "devDependencies": {
-    "tap": "^16.3.0"
+    "tap": "^21.0.0"
   }
 }
