@@ -104,7 +104,7 @@ async function processorPlugin(fastify, opts) {
 
       fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`);
 
-      // await deleteFile(fileId);
+      await deleteFile(fileId);
 
       fastify.log.info(`finished processing [${fileName}]`);
     } catch (error) {

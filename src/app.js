@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const AutoLoad = require("@fastify/autoload");
 const Env = require("@fastify/env");
 const S = require("fluent-json-schema");
@@ -25,6 +26,14 @@ module.exports = async function (fastify, opts) {
 
   fastify.log.info(`📁 Processing dir: ${fastify.config.PROCESSING_DIR}`);
   fastify.log.info(`📁 Download dir: ${fastify.config.DOWNLOAD_DIR}`);
+
+  if (!fs.existsSync(fastify.config.PROCESSING_DIR)) {
+    fs.mkdirSync(fastify.config.PROCESSING_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(fastify.config.DOWNLOAD_DIR)) {
+    fs.mkdirSync(fastify.config.DOWNLOAD_DIR, { recursive: true });
+  }
 
   // Register plugins
   fastify.register(require("@fastify/sensible"), {
