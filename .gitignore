@@ -1,6 +1,8 @@
 tmp
 .env*
 
+.vscode
+
 # Logs
 logs
 *.log
