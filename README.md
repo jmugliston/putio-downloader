@@ -1,13 +1,20 @@
-# Putio Downloader
+# Put.io File Downloader
 
-An API that can receive callbacks from [Put.io](https://put.io) and download files to a local directory.
+**Put.io File Downloader** is an API that can receive file callbacks (webhooks) from [Put.io](https://put.io) and download them to a local directory.
 
-This project was created using the [fastify-cli](https://github.com/fastify/fastify-cli).
+To receive file callbacks from Put.io, configure the URL here: https://app.put.io/settings/callback-url
 
-## Install
+The API can receive multiple file callbacks simultaneously, but downloads are queued and retrieved one at a time.
 
-```
-npm install
+See below for a flow of how the API works:
+
+```mermaid
+flowchart TD
+    A(New file added in Put.io) -->|Callback via POST request| B
+    B[Receive callback on /file endpoint] --> C
+    C[Queue file download] --> D
+    D[Download and unzip files] -->|Request zip| A
+    D --> E(Done)
 ```
 
 ## Getting Started
@@ -17,10 +24,10 @@ Create a .env file in the root of the project like the following:
 ```sh
 # Put.io access token
 ACCESS_TOKEN=XXXXXXXX
+# Processing directory for in-progress downloads
+PROCESSING_DIR=./processing
 # Location for downloaded files
 DOWNLOAD_DIR=./download
-# Processing directory for in-progress downloads
-PROCESSING_DIR=./tmp
 ```
 
 ### Download Schedule
@@ -33,13 +40,15 @@ DOWNLOAD_SCHEDULE_ENABLED=true
 DOWNLOAD_SCHEDULE_CRON=0 7 * * *
 ```
 
-## Callbacks
+## Install
 
-This API is designed to process callbacks from put.io.
-
-Go to https://app.put.io/settings/callback-url and add the URL where you want to receive callbacks.
+```
+npm install
+```
 
 ## Development
+
+Use the following to run the development server:
 
 ```sh
 npm run dev
@@ -47,8 +56,38 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
+You can test a file callback using curl e.g.
+
+```sh
+curl -X POST localhost:3000/file \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-d "file_id=<the-file-id>"
+```
+
 ## Test
 
 ```sh
 npm test
+```
+
+## Docker
+
+To build and run the Docker container:
+
+```sh
+# Build the container
+docker build -t putio-downloader .
+
+# Create a folder to mount as a volume for downloads
+mkdir data
+chmod 755 data
+
+# Run the container
+docker run \
+--volume ${PWD}/data:/data \
+--env ACCESS_TOKEN="token" \
+--env PROCESSING_DIR="/data/processing" \
+--env DOWNLOAD_DIR="/data/download" \
+-p 3000:3000 \
+putio-downloader:latest
 ```

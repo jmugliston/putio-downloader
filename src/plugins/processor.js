@@ -1,122 +1,82 @@
-const path = require("path");
-const fs = require("fs");
-const fp = require("fastify-plugin");
-const stream = require("stream");
-const unzip = require("unzip-stream");
-const retry = require("retry");
-const { promisify } = require("util");
+/**
+ * The file processor plugin.
+ * It creates a zip file on put.io and downloads it to the specified folder.
+ * @module processorPlugin
+ */
 
-const pipeline = promisify(stream.pipeline);
-const sleep = promisify(setTimeout);
+const path = require('path')
+const fs = require('fs')
+const fp = require('fastify-plugin')
 
+const utils = require('../utils/utils')
+
+/**
+ * This plugin is for processing put.io files.
+ * @async
+ * @param {FastifyInstance} fastify - The Fastify instance.
+ * @param {Object} opts - The plugin options.
+ * @param {string} opts.downloadDir - The directory where the downloaded files will be stored.
+ * @param {string} opts.processingDir - The directory where the file will downloaded/processed.
+ */
 async function processorPlugin(fastify, opts) {
-  const { downloadDir, processingDir } = opts;
+  const { downloadDir, processingDir } = opts
 
-  fastify.decorate("processor", async function processFile(fileId) {
+  /**
+   * Process a file by creating a zip file, downloading it, and extracting its contents.
+   * @async
+   * @param {number} fileId - The ID of the file to process.
+   * @returns {boolean} - Returns `true` if the file was processed successfully.
+   */
+  fastify.decorate('processor', async function processFile(fileId) {
     try {
-      const {
-        getFileInfo,
-        createZip,
-        checkZipStatus,
-        getDownloadStream,
-        deleteFile,
-      } = fastify.putio;
+      const { getFileInfo, createZip, getDownloadStream, deleteFile } =
+        fastify.putio
 
-      fastify.log.info({ fileId }, `checking file info [${fileId}]`);
+      fastify.log.info({ fileId }, `checking file info [${fileId}]`)
 
       const {
         file: { name: fileName },
-      } = await getFileInfo(fileId);
+      } = await getFileInfo(fileId)
 
-      fastify.log.info({ fileId }, `creating put.io zip file [${fileName}]`);
+      fastify.log.info({ fileId }, `creating put.io zip file [${fileName}]`)
 
-      const { zip_id: zipId } = await createZip(fileId);
+      const { zip_id: zipId } = await createZip(fileId)
 
-      const operation = retry.operation({
-        retries: 10,
-        factor: 4,
-        minTimeout: 1 * 3000,
-        maxTimeout: 120 * 1000,
-        randomize: true,
-      });
+      const url = await utils.waitForZip(zipId, fastify.putio.checkZipStatus)
 
-      const url = await new Promise(async (resolve, reject) => {
-        await sleep(3000);
+      fastify.log.info({ fileId, zipId }, `starting download [${fileName}]`)
 
-        operation.attempt(async function (currentAttempt) {
-          fastify.log.info(
-            { zipId },
-            `checking zip status attempt ${currentAttempt}`
-          );
+      const downloadStream = await getDownloadStream(url)
 
-          const res = await checkZipStatus(zipId);
-
-          if (operation.retry(!res.url)) {
-            fastify.log.warn({ zipId }, `zip file not ready [${fileName}]`);
-            return;
-          }
-
-          if (res.url) {
-            return resolve(res.url);
-          }
-
-          return reject("failed to create zip file in time");
-        });
-      });
-
-      fastify.log.info({ fileId, zipId }, `starting download [${fileName}]`);
-
-      const downloadStream = await getDownloadStream(url);
-
-      const processedItems = new Set();
-
-      await pipeline(
+      const processedItems = await utils.downloadAndUnzip(
         downloadStream,
-        unzip.Parse(),
-        stream.Transform({
-          objectMode: true,
-          transform: function (entry, e, cb) {
-            const type = entry.type;
-            if (type === "File") {
-              const outputFilepath = path.join(processingDir, entry.path);
-              const outputDir = path.dirname(outputFilepath);
-              if (!fs.existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true });
-              }
-              processedItems.add(path.dirname(entry.path).split(path.sep)[0]);
-              entry.pipe(fs.createWriteStream(outputFilepath)).on("finish", cb);
-            } else {
-              entry.autodrain();
-              cb();
-            }
-          },
-        })
-      );
+        processingDir
+      )
 
       for (item of processedItems) {
         fs.renameSync(
           path.join(processingDir, item),
           path.join(downloadDir, item)
-        );
+        )
       }
 
-      fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`);
+      fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`)
 
-      fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`);
+      fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`)
 
-      await deleteFile(fileId);
+      await deleteFile(fileId)
 
-      fastify.log.info(`finished processing [${fileName}]`);
+      fastify.log.info(`finished processing [${fileName}]`)
     } catch (error) {
       if (error.isAxiosError) {
-        fastify.log.error(error.toJSON());
+        fastify.log.error(error.toJSON())
       } else {
-        fastify.log.error(error);
+        fastify.log.error(error)
       }
     }
 
-    return true;
-  });
+    return true
+  })
 }
 
-module.exports = fp(processorPlugin);
+module.exports = fp(processorPlugin)

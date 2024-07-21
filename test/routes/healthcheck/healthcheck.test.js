@@ -1,9 +1,9 @@
 const { describe, it, beforeEach, afterEach } = require('node:test')
 const { equal, deepEqual } = require('node:assert')
 
-const { build } = require('../app')
+const { build } = require('../../app')
 
-describe('/', () => {
+describe('/healthcheck', () => {
   let app
 
   beforeEach(() => {
@@ -16,10 +16,11 @@ describe('/', () => {
 
   it('GET (200)', async () => {
     const response = await app.inject({
-      url: '/',
+      method: 'GET',
+      url: '/healthcheck',
     })
 
     equal(response.statusCode, 200)
-    deepEqual(response.payload, 'Put.io downloader API')
+    deepEqual(response.payload, JSON.stringify({ ok: true }))
   })
 })
