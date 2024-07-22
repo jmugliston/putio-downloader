@@ -5,7 +5,7 @@
  * @param {object} opts - The options object.
  * @returns {Promise<object>} - The response object.
  */
-module.exports = async function (fastify, opts) {
+export default async function (fastify, opts) {
   fastify.post('/', async function (request, reply) {
     if (!request?.body?.file_id) {
       return reply.badRequest('No file id in request')

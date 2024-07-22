@@ -2,6 +2,7 @@
   "name": "putio-downloader",
   "version": "1.12.1",
   "description": "Put.io downloader app",
+  "type": "module",
   "main": "app.js",
   "directories": {
     "test": "test"
@@ -23,7 +24,6 @@
     "axios": "^1.7.2",
     "fastify": "^4.28.1",
     "fastify-cli": "^6.2.1",
-    "fastify-healthcheck": "^4.4.0",
     "fastify-plugin": "^4.5.1",
     "fastq": "^1.17.1",
     "fluent-json-schema": "^5.0.0",
@@ -32,7 +32,9 @@
     "unzip-stream": "^0.3.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.7.0",
     "eslint": "^9.7.0",
+    "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3"
   }
 }

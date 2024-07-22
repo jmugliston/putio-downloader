@@ -1,9 +1,9 @@
-const { describe, it, beforeEach, afterEach, mock } = require('node:test')
-const { deepEqual } = require('node:assert')
-const axios = require('axios')
+import { describe, it, beforeEach, afterEach, mock } from 'node:test'
+import { deepEqual } from 'node:assert'
+import axios from 'axios'
 
-const { build } = require('../app')
-const putio = require('../../src/plugins/putio')
+import { build } from '../app.js'
+import putio from '../../src/plugins/putio.js'
 
 describe('Putio plugin', () => {
   let app

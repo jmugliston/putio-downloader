@@ -3,10 +3,10 @@
  * @module queue
  */
 
-const fp = require('fastify-plugin')
-const fastq = require('fastq')
+import fp from 'fastify-plugin'
+import fastq from 'fastq'
 
-module.exports = fp(async (fastify) => {
+export default fp(async (fastify) => {
   /**
    * Function to add a file to the queue.
    * @function queue

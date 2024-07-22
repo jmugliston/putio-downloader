@@ -1,8 +1,8 @@
-const { describe, it, beforeEach, afterEach } = require('node:test')
-const { equal, deepEqual } = require('node:assert')
-const fp = require('fastify-plugin')
+import { describe, it, beforeEach, afterEach } from 'node:test'
+import { equal, deepEqual } from 'node:assert'
+import fp from 'fastify-plugin'
 
-const { build } = require('../../app')
+import { build } from '../../app.js'
 
 describe('/file', () => {
   let app

@@ -4,7 +4,7 @@
  * @param {import('fastify').FastifyInstance} fastify - The Fastify instance.
  * @param {object} opts - The options object.
  */
-module.exports = async function (fastify, opts) {
+export default async function (fastify, opts) {
   /**
    * Handles GET requests to the root route.
    *

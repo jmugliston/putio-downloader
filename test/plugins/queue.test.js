@@ -1,9 +1,9 @@
-const { describe, it, beforeEach, afterEach, mock } = require('node:test')
-const { equal } = require('node:assert')
-const fastq = require('fastq')
+import { describe, it, beforeEach, afterEach, mock } from 'node:test'
+import { equal } from 'node:assert'
+import fastq from 'fastq'
 
-const { build } = require('../app')
-const queue = require('../../src/plugins/queue')
+import { build } from '../app.js'
+import queue from '../../src/plugins/queue.js'
 
 describe('Queue plugin', () => {
   let app

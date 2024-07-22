@@ -1,10 +1,15 @@
-const { describe, it, mock } = require('node:test')
-const { equal, strictEqual, rejects } = require('node:assert')
+import { describe, it, mock } from 'node:test'
+import { equal, strictEqual, rejects } from 'node:assert'
+import fs from 'fs'
+import path from 'path'
+import stream from 'stream'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
-const { waitForZip, downloadAndUnzip } = require('../../src/utils/utils')
-const fs = require('fs')
-const path = require('path')
-var stream = require('stream')
+import utils from '../../src/utils/utils.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 describe('utils', () => {
   describe('waitForZip', () => {
@@ -15,7 +20,7 @@ describe('utils', () => {
         url: 'https://example.com/zipfile.zip',
       }))
 
-      const result = await waitForZip(zipId, checkZipStatus)
+      const result = await utils.waitForZip(zipId, checkZipStatus)
 
       equal(result, 'https://example.com/zipfile.zip')
       strictEqual(checkZipStatus.mock.calls.length, 1)
@@ -28,7 +33,7 @@ describe('utils', () => {
       const checkZipStatus = mock.fn(() => ({}))
 
       await rejects(
-        async () => waitForZip(zipId, checkZipStatus, { retries: 0 }),
+        async () => utils.waitForZip(zipId, checkZipStatus, { retries: 0 }),
         /failed to create zip file$/
       )
 
@@ -52,7 +57,7 @@ describe('utils', () => {
         path.join(__dirname, '../test.zip')
       )
 
-      const items = await downloadAndUnzip(testZipStream, 'test-dir')
+      const items = await utils.downloadAndUnzip(testZipStream, 'test-dir')
 
       strictEqual(items.size, 1)
     })

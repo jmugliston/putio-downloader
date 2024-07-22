@@ -1,7 +1,7 @@
-const { describe, it, beforeEach, afterEach } = require('node:test')
-const { equal, deepEqual } = require('node:assert')
+import { describe, it, beforeEach, afterEach } from 'node:test'
+import { equal, deepEqual } from 'node:assert'
 
-const { build } = require('../app')
+import { build } from '../app.js'
 
 describe('/', () => {
   let app

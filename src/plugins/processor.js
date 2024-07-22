@@ -4,11 +4,11 @@
  * @module processorPlugin
  */
 
-const path = require('path')
-const fs = require('fs')
-const fp = require('fastify-plugin')
+import path from 'path'
+import fs from 'fs'
+import fp from 'fastify-plugin'
 
-const utils = require('../utils/utils')
+import utils from '../utils/utils.js'
 
 /**
  * This plugin is for processing put.io files.
@@ -53,7 +53,7 @@ async function processorPlugin(fastify, opts) {
         processingDir
       )
 
-      for (item of processedItems) {
+      for (const item of processedItems) {
         fs.renameSync(
           path.join(processingDir, item),
           path.join(downloadDir, item)
@@ -79,4 +79,4 @@ async function processorPlugin(fastify, opts) {
   })
 }
 
-module.exports = fp(processorPlugin)
+export default fp(processorPlugin)

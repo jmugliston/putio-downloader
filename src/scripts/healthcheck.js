@@ -2,7 +2,7 @@
  * Performs a health check against the API.
  */
 
-const http = require('http')
+import { request as _request } from 'http'
 
 const options = {
   host: 'localhost',
@@ -11,7 +11,7 @@ const options = {
   timeout: 2000,
 }
 
-const request = http.request(options, (res) => {
+const request = _request(options, (res) => {
   if (res.statusCode == 200) {
     process.exit(0)
   } else {

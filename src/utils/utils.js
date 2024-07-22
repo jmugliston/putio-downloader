@@ -1,12 +1,10 @@
-const fs = require('fs')
-const path = require('path')
-const stream = require('stream')
-const unzip = require('unzip-stream')
-const retry = require('retry')
+import fs from 'fs'
+import path from 'path'
+import stream from 'stream'
+import unzip from 'unzip-stream'
+import retry from 'retry'
 
-const { promisify } = require('util')
-
-const pipeline = promisify(stream.pipeline)
+import { pipeline } from 'stream/promises'
 
 /**
  * Waits for a zip file to be created by put.io and return the URL.
@@ -82,4 +80,6 @@ async function downloadAndUnzip(downloadStream, dir) {
   return processedItems
 }
 
-module.exports = { waitForZip, downloadAndUnzip }
+export default { waitForZip, downloadAndUnzip }
+
+export { waitForZip, downloadAndUnzip }

@@ -5,9 +5,9 @@
  * @param {Object} opts - The plugin options.
  * @param {string} opts.accessToken - The access token for the Put.io API.
  */
-const fp = require('fastify-plugin')
-const axios = require('axios')
-const qs = require('querystring')
+import fp from 'fastify-plugin'
+import axios from 'axios'
+import { stringify } from 'querystring'
 
 async function putio(fastify, opts) {
   const axiosInstance = axios.create({
@@ -45,15 +45,11 @@ async function putio(fastify, opts) {
    * @returns {Promise<Object>} The response data containing the created zip information.
    */
   async function createZip(fileId) {
-    return axiosInstance.post(
-      '/zips/create',
-      qs.stringify({ file_ids: fileId }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    )
+    return axiosInstance.post('/zips/create', stringify({ file_ids: fileId }), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
   }
 
   /**
@@ -87,7 +83,7 @@ async function putio(fastify, opts) {
   async function deleteFile(fileId) {
     return axiosInstance.post(
       '/files/delete',
-      qs.stringify({ file_ids: fileId }),
+      stringify({ file_ids: fileId }),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -106,4 +102,4 @@ async function putio(fastify, opts) {
   })
 }
 
-module.exports = fp(putio)
+export default fp(putio)

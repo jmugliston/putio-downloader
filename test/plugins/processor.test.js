@@ -1,11 +1,11 @@
-const { describe, it, mock, before, after } = require('node:test')
-const { equal, strictEqual } = require('node:assert')
-const fs = require('fs')
-const fp = require('fastify-plugin')
+import { describe, it, mock, before, after } from 'node:test'
+import { equal, strictEqual } from 'node:assert'
+import fs from 'fs'
+import fp from 'fastify-plugin'
 
-const { build } = require('../app')
-const processor = require('../../src/plugins/processor')
-const utils = require('../../src/utils/utils')
+import { build } from '../app.js'
+import processor from '../../src/plugins/processor.js'
+import utils from '../../src/utils/utils.js'
 
 describe('Processor plugin', () => {
   let app
@@ -40,7 +40,7 @@ describe('Processor plugin', () => {
     app.close()
   })
 
-  it('process files', async (t) => {
+  it('process files', async () => {
     const mockRenameSync = mock.method(fs, 'renameSync', () => {})
     const mockWaitForZip = mock.method(utils, 'waitForZip', async () => {})
     const mockDownloadAndUnzip = mock.method(
@@ -58,11 +58,11 @@ describe('Processor plugin', () => {
     equal(mockRenameSync.mock.calls.length, 1)
   })
 
-  it('process files with error', async (t) => {
+  it('process files with error', async () => {
     mock.method(fs, 'renameSync', () => {})
     mock.method(utils, 'waitForZip', async () => Promise.reject('test fail'))
     mock.method(utils, 'downloadAndUnzip', async () => ['test-file'])
-    mockLogError = mock.method(app.log, 'error', () => {})
+    const mockLogError = mock.method(app.log, 'error', () => {})
 
     await app.processor('test-item')
 
@@ -70,13 +70,13 @@ describe('Processor plugin', () => {
     equal(mockLogError.mock.calls[0].arguments[0], 'test fail')
   })
 
-  it('process files with (axios) error', async (t) => {
+  it('process files with (axios) error', async () => {
     mock.method(fs, 'renameSync', () => {})
     mock.method(utils, 'waitForZip', async () => {})
     mock.method(utils, 'downloadAndUnzip', async () =>
       Promise.reject({ isAxiosError: true, toJSON: () => 'test fail' })
     )
-    mockLogError = mock.method(app.log, 'error', () => {})
+    const mockLogError = mock.method(app.log, 'error', () => {})
 
     await app.processor('test-item')
 

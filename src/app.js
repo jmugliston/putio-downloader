@@ -3,16 +3,25 @@
  * @module app
  */
 
-const path = require('path')
-const fs = require('fs')
-const AutoLoad = require('@fastify/autoload')
-const Env = require('@fastify/env')
-const S = require('fluent-json-schema')
-const schedule = require('node-schedule')
-const pjson = require('../package.json')
-const putio = require('./plugins/putio')
-const processor = require('./plugins/processor')
-const queue = require('./plugins/queue')
+import url from 'url'
+import path from 'path'
+import fs from 'fs'
+import AutoLoad from '@fastify/autoload'
+import Env from '@fastify/env'
+import { createRequire } from 'module'
+import { scheduleJob } from 'node-schedule'
+import { fastifySensible } from '@fastify/sensible'
+import { fastifyFormbody } from '@fastify/formbody'
+import { S } from 'fluent-json-schema'
+
+import putio from './plugins/putio.js'
+import processor from './plugins/processor.js'
+import queue from './plugins/queue.js'
+
+const PJSON = createRequire(import.meta.url)('../package.json')
+
+const __filename = url.fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /**
  * Initializes the Fastify application.
@@ -21,8 +30,8 @@ const queue = require('./plugins/queue')
  * @param {object} opts - The options object.
  * @returns {Promise<void>}
  */
-module.exports = async function (fastify, opts) {
-  fastify.log.info(`App version: ${pjson.version}`)
+export default async function (fastify, opts) {
+  fastify.log.info(`App version: ${PJSON.version}`)
 
   // Get environment config
   await fastify.register(Env, {
@@ -48,11 +57,10 @@ module.exports = async function (fastify, opts) {
   }
 
   // Register plugins
-  fastify.register(require('@fastify/sensible'), {
+  fastify.register(fastifySensible, {
     errorHandler: false,
   })
-  fastify.register(require('fastify-healthcheck'))
-  fastify.register(require('@fastify/formbody'))
+  fastify.register(fastifyFormbody)
 
   // Register custom plugins (need to be loaded in order)
   await fastify.register(putio, { accessToken: fastify.config.ACCESS_TOKEN })
@@ -79,7 +87,7 @@ module.exports = async function (fastify, opts) {
     fastify.log.info(
       `🕒 Download schedule enabled: ${fastify.config.DOWNLOAD_SCHEDULE_CRON}`
     )
-    schedule.scheduleJob(fastify.config.DOWNLOAD_SCHEDULE_CRON, async () => {
+    scheduleJob(fastify.config.DOWNLOAD_SCHEDULE_CRON, async () => {
       fastify.log.info('Starting download files job')
       const { files } = await fastify.putio.getFiles()
       for (const file of files) {
