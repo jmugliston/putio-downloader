@@ -1,3 +1,5 @@
+![example workflow](https://github.com/atheius/putio-downloader/actions/workflows/node.js.yml/badge.svg)
+
 # Put.io File Downloader
 
 **Put.io File Downloader** is an API that can receive file callbacks (webhooks) from [Put.io](https://put.io) and download them to a local directory.
