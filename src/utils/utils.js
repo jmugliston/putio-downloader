@@ -24,7 +24,7 @@ async function waitForZip(zipId, checkZipStatus, options) {
     ...options,
   })
 
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     operation.attempt(async function () {
       const res = await checkZipStatus(zipId)
 
