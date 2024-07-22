@@ -1,4 +1,4 @@
-![example workflow](https://github.com/atheius/putio-downloader/actions/workflows/node.js.yml/badge.svg)
+![workflow](https://github.com/atheius/putio-downloader/actions/workflows/main.yml/badge.svg)
 
 # Put.io File Downloader
 
