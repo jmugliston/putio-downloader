@@ -1,3 +1,5 @@
+# Put.io File Downloader
+
 <div align="center">
     <img
       src="https://github.com/atheius/putio-downloader/raw/HEAD/logo.jpeg"
@@ -11,8 +13,6 @@
 ![buiild](https://github.com/atheius/putio-downloader/actions/workflows/main.yml/badge.svg) ![docker](https://img.shields.io/docker/v/atheius/putio-downloader)
 
 </div>
-
-# Put.io File Downloader
 
 **Put.io File Downloader** is an API that can receive file callbacks (webhooks) from [Put.io](https://put.io) and download them to a local directory.
 
