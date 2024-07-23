@@ -17,9 +17,10 @@ import utils from '../utils/utils.js'
  * @param {Object} opts - The plugin options.
  * @param {string} opts.downloadDir - The directory where the downloaded files will be stored.
  * @param {string} opts.processingDir - The directory where the file will downloaded/processed.
+ * @param {string} opts.deleteRemoteFilesAfterDownload - Should remote files be deleted after download?
  */
 async function processorPlugin(fastify, opts) {
-  const { downloadDir, processingDir } = opts
+  const { downloadDir, processingDir, deleteRemoteFilesAfterDownload } = opts
 
   /**
    * Process a file by creating a zip file, downloading it, and extracting its contents.
@@ -62,9 +63,10 @@ async function processorPlugin(fastify, opts) {
 
       fastify.log.info({ fileId, zipId }, `finished download [${fileName}]`)
 
-      fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`)
-
-      await deleteFile(fileId)
+      if (deleteRemoteFilesAfterDownload) {
+        fastify.log.info({ fileId }, `deleting file from put.io [${fileName}]`)
+        await deleteFile(fileId)
+      }
 
       fastify.log.info(`finished processing [${fileName}]`)
     } catch (error) {

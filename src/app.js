@@ -40,6 +40,7 @@ export default async function (fastify, opts) {
       .prop('ACCESS_TOKEN', S.string().required().default(''))
       .prop('PROCESSING_DIR', S.string().required().default('./download'))
       .prop('DOWNLOAD_DIR', S.string().required().default('./download'))
+      .prop('DELETE_REMOTE_FILES_AFTER_DOWNLOAD', S.boolean().default(false))
       .prop('DOWNLOAD_SCHEDULE_ENABLED', S.boolean().default(false))
       .prop('DOWNLOAD_SCHEDULE_CRON', S.string().default('0 6 * * *'))
       .valueOf(),
@@ -67,6 +68,8 @@ export default async function (fastify, opts) {
   await fastify.register(processor, {
     processingDir: fastify.config.PROCESSING_DIR,
     downloadDir: fastify.config.DOWNLOAD_DIR,
+    deleteRemoteFilesAfterDownload:
+      fastify.config.DELETE_REMOTE_FILES_AFTER_DOWNLOAD,
   })
   await fastify.register(queue)
 

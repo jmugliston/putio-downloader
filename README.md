@@ -24,11 +24,13 @@ See below for a flow of how the API works:
 
 ```mermaid
 flowchart TD
-    A(New file added in Put.io) -->|Callback via POST request| B
+    A("New file(s) added in Put.io") -->|Callback via POST request| B
     B[Receive callback on /file endpoint] --> C
-    C[Queue file download] --> D
-    D[Download and unzip files] -->|Request zip| A
-    D --> E(Done)
+    C[Queue download] --> D
+    D["Download and unzip file(s)"] -->|Request zip| A
+    D --> E
+    E-->|Delete file| A
+    E["Delete remote file (optional)"] --> F(Done)
 ```
 
 ## Getting Started
@@ -42,6 +44,8 @@ ACCESS_TOKEN=XXXXXXXX
 PROCESSING_DIR=./processing
 # Location for downloaded files
 DOWNLOAD_DIR=./download
+# Specify whether files should be deleted after download
+DELETE_REMOTE_FILES_AFTER_DOWNLOAD=true
 ```
 
 ### Download Schedule
