@@ -10,7 +10,7 @@
 
 <div align="center">
 
-![buiild](https://github.com/atheius/putio-downloader/actions/workflows/main.yml/badge.svg) ![docker](https://img.shields.io/docker/v/atheius/putio-downloader)
+![buiild](https://github.com/atheius/putio-downloader/actions/workflows/main.yml/badge.svg) ![docker](https://img.shields.io/docker/v/atheius/putio-downloader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 </div>
 
