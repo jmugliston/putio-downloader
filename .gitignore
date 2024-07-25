@@ -1,6 +1,6 @@
 tmp
 .env*
-
+!.env.example
 .vscode
 
 # Logs
