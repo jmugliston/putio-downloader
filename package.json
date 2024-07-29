@@ -19,7 +19,8 @@
         {
           "npmPublish": false
         }
-      ]
+      ],
+      "@semantic-release/github"
     ]
   },
   "scripts": {
