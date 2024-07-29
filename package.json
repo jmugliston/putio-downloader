@@ -7,39 +7,11 @@
   "directories": {
     "test": "test"
   },
-  "release": {
-    "branches": [
-      "main"
-    ],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "angular",
-          "releaseRules": [
-            {
-              "type": "chore",
-              "release": "patch"
-            }
-          ]
-        }
-      ],
-      "@semantic-release/release-notes-generator",
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": false
-        }
-      ],
-      "@semantic-release/github"
-    ]
-  },
   "scripts": {
     "test": "node --test --experimental-test-coverage test/**/*.test.js",
     "lint": "eslint .",
     "start": "fastify start -l info -P ./src/app.js --address 0.0.0.0",
-    "dev": "fastify start -w -l info -P ./src/app.js --ignore-watch='node_modules .git tmp'",
-    "release": "semantic-release"
+    "dev": "fastify start -w -l info -P ./src/app.js --ignore-watch='node_modules .git tmp'"
   },
   "keywords": [],
   "author": "James Mugliston",
