@@ -1,6 +1,6 @@
 {
   "name": "putio-downloader",
-  "version": "2.3.15",
+  "version": "2.3.16",
   "description": "Put.io downloader app",
   "type": "module",
   "main": "app.js",
