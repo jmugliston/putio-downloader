@@ -8,7 +8,7 @@ import path from 'path'
 import fs from 'fs'
 import fp from 'fastify-plugin'
 
-import utils from '../utils/utils.js'
+import { downloadAndUnzip, waitForZip } from '../utils/utils.js'
 
 /**
  * This plugin is for processing put.io files.
@@ -43,13 +43,13 @@ async function processorPlugin(fastify, opts) {
 
       const { zip_id: zipId } = await createZip(fileId)
 
-      const url = await utils.waitForZip(zipId, fastify.putio.checkZipStatus)
+      const url = await waitForZip(zipId, fastify.putio.checkZipStatus)
 
       fastify.log.info({ fileId, zipId }, `starting download [${fileName}]`)
 
       const downloadStream = await getDownloadStream(url)
 
-      const processedItems = await utils.downloadAndUnzip(
+      const processedItems = await downloadAndUnzip(
         downloadStream,
         processingDir
       )

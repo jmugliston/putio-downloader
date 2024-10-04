@@ -63,11 +63,21 @@ async function downloadAndUnzip(downloadStream, dir) {
         const type = entry.type
         if (type === 'File') {
           const outputFilepath = path.join(dir, entry.path)
+
           const outputDir = path.dirname(outputFilepath)
+
           if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true })
           }
-          processedItems.add(path.dirname(entry.path).split(path.sep)[0])
+
+          const processedDir = path.dirname(entry.path).split(path.sep)[0]
+
+          if (processedDir === '') {
+            processedItems.add(entry.path)
+          } else {
+            processedItems.add(processedDir)
+          }
+
           entry.pipe(fs.createWriteStream(outputFilepath)).on('finish', cb)
         } else {
           entry.autodrain()
@@ -79,7 +89,5 @@ async function downloadAndUnzip(downloadStream, dir) {
 
   return processedItems
 }
-
-export default { waitForZip, downloadAndUnzip }
 
 export { waitForZip, downloadAndUnzip }
