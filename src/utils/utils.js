@@ -72,7 +72,7 @@ async function downloadAndUnzip(downloadStream, dir) {
 
           const processedDir = path.dirname(entry.path).split(path.sep)[0]
 
-          if (processedDir === '') {
+          if (['', '.'].includes(processedDir)) {
             processedItems.add(entry.path)
           } else {
             processedItems.add(processedDir)
@@ -89,5 +89,7 @@ async function downloadAndUnzip(downloadStream, dir) {
 
   return processedItems
 }
+
+export default { waitForZip, downloadAndUnzip }
 
 export { waitForZip, downloadAndUnzip }
