@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node --test --experimental-test-coverage test/**/*.test.js",
+    "test": "c8 node --test test/**/*.test.js",
     "lint": "eslint .",
     "start": "fastify start -l info -P ./src/app.js --address 0.0.0.0",
     "dev": "fastify start -w -l info -P ./src/app.js --ignore-watch='node_modules .git tmp'"
@@ -33,10 +33,11 @@
     "unzip-stream": "^0.3.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.11.1",
-    "eslint": "^9.12.0",
+    "@eslint/js": "^9.13.0",
+    "c8": "^10.1.2",
+    "eslint": "^9.13.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
-    "semantic-release": "^24.1.2"
+    "semantic-release": "^24.2.0"
   }
 }
