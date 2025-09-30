@@ -19,7 +19,7 @@
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
     "@fastify/basic-auth": "^6.2.0",
-    "@fastify/env": "^5.0.2",
+    "@fastify/env": "^5.0.3",
     "@fastify/formbody": "^8.0.2",
     "@fastify/sensible": "^6.0.3",
     "axios": "^1.12.2",
