@@ -61,7 +61,7 @@ DOWNLOAD_SCHEDULE_CRON=0 7 * * *
 ## Install
 
 ```
-npm install
+pnpm install
 ```
 
 ## Development
@@ -69,7 +69,7 @@ npm install
 Use the following to run the development server:
 
 ```sh
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -85,7 +85,7 @@ curl -X POST localhost:3000/file \
 ## Test
 
 ```sh
-npm test
+pnpm run test
 ```
 
 ## Docker
