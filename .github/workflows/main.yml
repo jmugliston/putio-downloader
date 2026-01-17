@@ -26,7 +26,6 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm add -g c8
-      - run: pnpm run build --if-present
       - run: |
           shopt -s globstar
           c8 node --test test/**/*.test.js
