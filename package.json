@@ -28,7 +28,7 @@
     "fastify-plugin": "^5.1.0",
     "fastq": "^1.20.1",
     "fluent-json-schema": "^5.0.0",
-    "globals": "^17.0.0",
+    "globals": "^17.2.0",
     "node-schedule": "^2.1.1",
     "retry": "^0.13.1",
     "unzip-stream": "^0.3.4"
