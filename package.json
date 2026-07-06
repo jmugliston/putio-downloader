@@ -34,6 +34,7 @@
     "unzip-stream": "^0.3.4"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "c8": "^11.0.0",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
